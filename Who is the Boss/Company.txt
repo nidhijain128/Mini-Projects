@@ -1,0 +1,100 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+// Time complexity - O(n^2) 
+	//This is because I am checking each employee with the other for common manager
+//Space complexity - O(n)
+
+public class Company {
+
+	// IMPORTANT: DO NOT MODIFY THIS CLASS
+	public static class Employee {
+
+		private final int id;
+		private final String name;
+		private List<Employee> reports;
+
+		public Employee(int id, String name) {
+			this.id = id;
+			this.name = name;
+			this.reports = new ArrayList<Employee>();
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public List<Employee> getReports() {
+			return reports;
+		}
+
+		public void addReport(Employee employee) {
+			reports.add(employee);
+		}
+	}
+
+	/*
+	 * Read the attached PDF for more explanation about the problem Note: Don't
+	 * modify the signature of this function
+	 * 
+	 * @param ceo
+	 * 
+	 * @param firstEmployee
+	 * 
+	 * @param secondEmployee
+	 * 
+	 * @return common manager for both employees that is closest to them.
+	 */
+	@SuppressWarnings("unused")
+	public static Employee closestCommonManager(Employee ceo, Employee firstEmployee, Employee secondEmployee) {
+		// Implement me
+		
+		//checking if any of the two employees to be checked are not null
+		if (firstEmployee == null || secondEmployee == null) {
+			System.out.println("Incorrect values of employees");
+			return null;
+		}
+		
+		//a list of employees that report to the current reporting manager
+		List<Employee> listEmployees = new LinkedList<Employee>();
+		int first = firstEmployee.getId();
+		int second = secondEmployee.getId();
+		
+		//if ceo is null then return null
+		if (ceo == null)
+			return null;
+
+		//check if the ceo is the common manager of the two employees
+		for (int i = 0; i < ceo.reports.size(); i++) {
+			int temp = ceo.reports.get(i).id;
+			if (temp == first || temp == second)
+				return ceo;
+		}
+
+		//for each employee in the list of managers, call the closestCommonManager recursively
+		for (int i = 0; i < ceo.reports.size(); i++) {
+			Employee traverse = closestCommonManager(ceo.reports.get(i),
+					firstEmployee, secondEmployee);
+			if (traverse != null)
+				listEmployees.add(traverse);
+		}
+
+		//if only one employee then return the employee as the closest manager
+		if (listEmployees.size() == 1)
+			return listEmployees.get(0);
+
+		//check the list for each pair of employees, if both the employees are under the current ceo then return ceo else return the corresponding employee
+		for (int i = 0; i < listEmployees.size() - 1; i++)
+			for (int j = i + 1; j < listEmployees.size(); j++) {
+				if (listEmployees.get(i) != null && listEmployees.get(j) != null && listEmployees.get(i).getId() != listEmployees.get(j).getId())
+					return ceo;
+				return listEmployees.get(i) != null ? listEmployees.get(i) : listEmployees.get(j);
+			}
+		return null;
+	}
+};
